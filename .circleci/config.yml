@@ -17,9 +17,10 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
       # - image: cimg/base:stable
-      - image: cimg/base:2021.01
+      # - image: cimg/base:2021.01
       # - image: cimg/node:17.2.0
       # - image: cimg/python:3.10.2
+      - image: cimg/python:3.11
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -38,10 +39,10 @@ jobs:
             uname -a
             lsb_release -a
             id
-            sudo apt-get update -y
+            # sudo apt-get update -y
             # sudo apt-get install python3 python3-pip python3-setuptools
             # sudo apt-get install python3 python3-pip
-            sudo apt-get install -y python3-pip
+            sudo apt-get install -y python3-setuptools python3-pip
             pip3 install ruamel.yaml
             python3 --version
             # sudo apt-get install python3-pip
