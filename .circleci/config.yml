@@ -17,23 +17,17 @@ jobs:
       - run:
           name: "Say hello"
           command: |
+            set -x
             echo Hello, World!
-            echo pwd
             pwd
-            echo env
             env
-            echo uname
             uname -a
-            echo lsb_release
             lsb_release -a
-            echo python --version
+            id
             python3 --version
-            apt install python3-pip
-            echo which pip
+            apt-get install python3-pip
             which pip 
-            echo which pip3
             which pip3
-            echo pip list
             pip list
 
 
