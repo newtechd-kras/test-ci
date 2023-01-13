@@ -110,10 +110,10 @@ workflows:
           rel: "jp"
           file: "./rel/jp/rel.txt"
            
-no_job_execution:
-    when:
-      and:
-        - not: << pipeline.parameters.test-ci-release_us >>
-        - not: << pipeline.parameters.test-ci-release_jp >>
-    jobs:
-      - no_job_execution
+  no_job_execution:
+      when:
+        and:
+          - not: << pipeline.parameters.test-ci-release_us >>
+          - not: << pipeline.parameters.test-ci-release_jp >>
+      jobs:
+        - no_job_execution
