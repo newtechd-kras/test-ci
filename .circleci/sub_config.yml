@@ -65,6 +65,8 @@ jobs:
           command: |
             set -x
             echo Hello, World!
+            rel = << parameters.rel >>
+            file = << parameters.file >>
             echo rel=${rel} file=${file}
             pwd
             env
