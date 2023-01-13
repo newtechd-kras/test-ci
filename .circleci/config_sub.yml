@@ -1,0 +1,106 @@
+version: 2.1
+orbs:
+  aws: circleci/aws-cli@2.0.2
+  kubernetes: circleci/kubernetes@0.12.0
+## define 
+parameters:
+  test-ci-release_us:
+    type: boolean
+    default: false
+  test-ci-release_jp:
+    type: boolean
+    default: false
+
+executors:
+  default:
+    docker:
+      - image: cimg/base:2021.01
+    environment:
+      TZ: "JST-9"
+
+jobs:
+  pipeline_start:
+    executor:
+      name: default
+    steps:
+      - run:
+          name: pipeline_start
+          command: |
+            set -x
+            echo "Execution date=`date`"
+            echo "Processing branch=${CIRCLE_PROJECT_REPONAME}"
+            echo "Processing branch=${CIRCLE_BRANCH}"
+            echo "Execution user=${CIRCLE_USERNAME}"
+            echo "----- circleci run -----"
+            
+  clone_latest_script:
+    executor:
+      name: default
+    steps:
+      - run:
+          name: clone_repo
+          command: |
+            echo "----- clone steps -----"
+            git_exe_user=${USERNAME}
+            git_exe_user_token=${TOKEN}
+            echo "----- clone steps -----"
+            git clone https://${git_exe_user}:${git_exe_user_token}@github.com/newtechd-kras/test-ci.git
+
+  execute_shell_script:
+    parameters:
+      rel:
+        type: string
+        default: ""
+      file:
+        type: string
+        default: ""
+    executor:
+      name: default
+    steps:
+      - run:
+          name: execute_script
+          command: |
+            set -x
+            echo "----- execute steps -----"
+            rel="<< parameters.rel >>"
+            file="<< parameters.file >>"
+            git_exe_user=${USERNAME}
+            git_exe_user_token=${TOKEN}
+            # clone
+            git clone --recursive https://${git_exe_user}:${git_exe_user_token}@github.com/newtechd-kras/test-ci.git
+            git config --global user.email "kras@newtechd.com"
+            echo "----- execute steps end -----"
+  #
+  no_job_execution:
+    docker:
+      - image: cimg/base:2021.01
+    environment:
+      TZ: "JST-9"
+    steps:
+      - run:
+          name: no_job_execution
+          command: |
+            echo "------------ Job execution is skipped"
+
+workflows:
+  version: 2.1
+  test-ci-release_us:
+    when: << pipeline.parameters.test-ci-release_us >>
+    jobs:
+      - execute_shell_script:
+          rel: "us"
+          file: "./rel/us/rel.txt"
+  test-ci-release_jp:
+    when: << pipeline.parameters.test-ci-release_jp >>
+    jobs:
+      - execute_shell_script:
+          rel: "jp"
+          file: "./rel/jp/rel.txt"
+           
+no_job_execution:
+    when:
+      and:
+        - not: << pipeline.parameters.test-ci-release_us >>
+        - not: << pipeline.parameters.test-ci-release_jp >>
+    jobs:
+      - no_job_execution
