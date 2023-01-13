@@ -19,6 +19,8 @@ jobs:
           command: |
             echo Hello, World!
             pwd
+            asd
+            ls -8
             ls -laR
             env
 
