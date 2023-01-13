@@ -25,7 +25,7 @@ jobs:
             lsb_release -a
             id
             python3 --version
-            apt-get install python3-pip
+            sudo apt-get install python3-pip
             which pip 
             which pip3
             pip list
