@@ -29,7 +29,7 @@ jobs:
           name: Generate config
           command: |
             set -x
-            ./generate-config > generated_config.yml
+            # ./generate-config > generated_config.yml
             env
             pwd
             cat generated_config.yml
