@@ -59,6 +59,7 @@ jobs:
     executor:
       name: default
     steps:
+      - checkout
       - run:
           name: execute_script
           command: |
