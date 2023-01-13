@@ -38,9 +38,10 @@ jobs:
             uname -a
             lsb_release -a
             id
-            # sudo apt-get update -y
+            # sudo apt-get update -ypip
             # sudo apt-get install python3 python3-pip python3-setuptools
             sudo apt-get install python3 python3-pip
+            pip3 install ruamel.yaml
             python3 --version
             # sudo apt-get install python3-pip
             which pip 
