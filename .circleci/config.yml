@@ -2,16 +2,36 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+# this allows you to use CircleCI's dynamic configuration feature
+# https://circleci.com/docs/ja/using-dynamic-configuration/
+setup: true
+
 orbs:
   # The python orb contains a set of prepackaged CircleCI configuration you can use repeatedly in your configuration files
   # Orb commands and jobs help you with common scripting around a language/tool
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@2.1.1
+  continuation: circleci/continuation@0.1.2
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
+  setup:
+    executor: continuation/default
+    steps:
+      - checkout # checkout code
+      - run: # run a command
+          name: Generate config
+          command: |
+            set -x
+            ./generate-config > generated_config.yml
+            env
+            pwd
+            cat generated_config.yml
+      - continuation/continue:
+          configuration_path: generated_config.yml # use newly generated config to continue
+    
   say-hello:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
@@ -65,6 +85,9 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
+  setup:
+    jobs:
+      - setup
   say-hello-workflow:
     jobs:
       - say-hello
