@@ -28,6 +28,11 @@ jobs:
             lsb_release -a
             echo python --version
             python3 --version
+            apt install python3-pip
+            echo which pip
+            which pip 
+            echo which pip3
+            which pip3
             echo pip list
             pip list
 
