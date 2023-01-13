@@ -1,119 +1,20 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# this allows you to use CircleCI's dynamic configuration feature
-# https://circleci.com/docs/ja/using-dynamic-configuration/
 setup: true
-
 orbs:
-  # The python orb contains a set of prepackaged CircleCI configuration you can use repeatedly in your configuration files
-  # Orb commands and jobs help you with common scripting around a language/tool
-  # so you dont have to copy and paste it everywhere.
-  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
-  python: circleci/python@2.1.1
-  # continuation: circleci/continuation@0.1.2
-
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  # setup:
-  #   # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-  #   # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-  #   # docker:
-  #   #   - image: cimg/python:3.11
-  #   executor: continuation/default
-  #   steps:
-  #     - checkout # checkout code
-  #     - run: # run a command
-  #         name: Generate config
-  #         command: |
-  #           set -x
-  #           # ./generate-config > generated_config.yml
-  #           env
-  #           pwd
-  #           cat generated_config.yml
-  #     - continuation/continue:
-  #         configuration_path: generated_config.yml # use newly generated config to continue
-    
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      # - image: cimg/base:stable
-      # - image: cimg/base:2021.01
-      # - image: cimg/node:17.2.0
-      # - image: cimg/python:3.10.2
-      - image: cimg/python:3.11
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      # - python/install-packages:
-      #     pkg-manager: pip
-      #     # app-dir: ~/project/package-directory/  # If you're requirements.txt isn't in the root directory.
-      #     # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.      
-      # - python/install-packages:
-      #     pkg-manager: pip
-      # - python/install-packages:
-      #     pip-dependency-file: dev-requirements.txt
-      #     pkg-manager: pip
-      # - python/install-packages:
-      #     args: pytest
-      #     pkg-manager: pip
-      #     pypi-cache: false
-      - run:
-          name: "Say hello"
-          command: |
-            set -x
-            echo Hello, World!
-            pwd
-            env
-            uname -a
-            lsb_release -a
-            id
-            git branch
-            git status
-            which pip 
-            which pip3
-            # sudo apt-get update -y
-            # sudo apt-get install python3 python3-pip python3-setuptools
-            # sudo apt-get install python3 python3-pip
-            # sudo apt-get install -y python3-setuptools python3-pip
-            pip3 install ruamel.yaml
-            python3 --version
-            # sudo apt-get install python3-pip
-            pip3 list
-
-  test-jp:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      - image: cimg/python:3.11
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      - run:
-          name: "test jp"
-          command: |
-            set -x
-            echo test jp
-            git branch
-            git status
-            pip3 install ruamel.yaml
-            python3 --version
-            pip3 list
-
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  path-filtering: circleci/path-filtering@0.0.2
 workflows:
-  say-hello-workflow:
-    jobs:
-      - say-hello
+  # say-hello-workflow:
+  #   jobs:
+  #     - say-hello
   # setup:
   #   jobs:
   #     - setup
   test-jp-workflow:
     jobs:
-      - test-jp
+      - path-filtering/filter:
+          base-revision: << pipeline.git.branch >>
+          config-path: .circleci/sub_config.yml
+          mapping: |
+            rel/jp/.*      test-ci-release_jp         true
+            rel/us/.*      test-ci-release_us         true

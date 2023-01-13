@@ -1,7 +1,8 @@
 version: 2.1
 orbs:
-  aws: circleci/aws-cli@2.0.2
-  kubernetes: circleci/kubernetes@0.12.0
+  python: circleci/python@2.1.1
+  path-filtering: circleci/path-filtering@0.0.2
+
 ## define 
 parameters:
   test-ci-release_us:
@@ -14,7 +15,7 @@ parameters:
 executors:
   default:
     docker:
-      - image: cimg/base:2021.01
+      - image: cimg/python:3.11
     environment:
       TZ: "JST-9"
 
@@ -32,7 +33,7 @@ jobs:
             echo "Processing branch=${CIRCLE_BRANCH}"
             echo "Execution user=${CIRCLE_USERNAME}"
             echo "----- circleci run -----"
-            
+
   clone_latest_script:
     executor:
       name: default
@@ -40,6 +41,7 @@ jobs:
       - run:
           name: clone_repo
           command: |
+            set -x
             echo "----- clone steps -----"
             git_exe_user=${USERNAME}
             git_exe_user_token=${TOKEN}
@@ -61,15 +63,25 @@ jobs:
           name: execute_script
           command: |
             set -x
-            echo "----- execute steps -----"
-            rel="<< parameters.rel >>"
-            file="<< parameters.file >>"
-            git_exe_user=${USERNAME}
-            git_exe_user_token=${TOKEN}
-            # clone
-            git clone --recursive https://${git_exe_user}:${git_exe_user_token}@github.com/newtechd-kras/test-ci.git
-            git config --global user.email "kras@newtechd.com"
-            echo "----- execute steps end -----"
+            echo Hello, World!
+            pwd
+            env
+            uname -a
+            lsb_release -a
+            id
+            git branch
+            git status
+            which pip 
+            which pip3
+            # sudo apt-get update -y
+            # sudo apt-get install python3 python3-pip python3-setuptools
+            # sudo apt-get install python3 python3-pip
+            # sudo apt-get install -y python3-setuptools python3-pip
+            pip3 install ruamel.yaml
+            python3 --version
+            # sudo apt-get install python3-pip
+            pip3 list
+
   #
   no_job_execution:
     docker:
