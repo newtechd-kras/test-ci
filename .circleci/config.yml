@@ -26,8 +26,10 @@ jobs:
             uname -a
             echo lsb_release
             lsb_release -a
+            echo python --version
             python3 --version
-            pip3 list
+            echo pip list
+            pip list
 
 
 # Invoke jobs via workflows
