@@ -38,6 +38,7 @@ jobs:
             uname -a
             lsb_release -a
             id
+            sudo apt-get update -y
             sudo apt-get install python3 python3-pip python3-setuptools
             python3 --version
             # sudo apt-get install python3-pip
