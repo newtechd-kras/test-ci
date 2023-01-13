@@ -65,6 +65,7 @@ jobs:
           command: |
             set -x
             echo Hello, World!
+            echo rel=${rel} file=${file}
             pwd
             env
             uname -a
