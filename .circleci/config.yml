@@ -18,11 +18,16 @@ jobs:
           name: "Say hello"
           command: |
             echo Hello, World!
+            echo pwd
             pwd
-            asd
-            ls -8
-            ls -laR
+            echo env
             env
+            echo uname
+            uname -a
+            echo lsb_release
+            lsb_release -a
+            python3 --version
+            pip3 list
 
 
 # Invoke jobs via workflows
