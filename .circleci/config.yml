@@ -48,6 +48,8 @@ jobs:
             uname -a
             lsb_release -a
             id
+            git branch
+            git status
             which pip 
             which pip3
             # sudo apt-get update -y
