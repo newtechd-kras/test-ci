@@ -87,11 +87,9 @@ jobs:
             TARGET_REPO_LIST="~/work/"
             # execute yaml update
             TARGET_SERVICE_LIST="${WORK_DIR}/${SUBSIDIARY}/${ENV}/service.list"
-            ls -l ~
-            ls -l ~/work
-            ls -l ~/work/jp
-            ls -l ~/work/jp/dev
             ls -l ${TARGET_SERVICE_LIST}
+            cat ${TARGET_SERVICE_LIST}
+            echo "---------------"
             while read service
             do 
               echo "service=${service}"
