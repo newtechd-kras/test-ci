@@ -41,11 +41,14 @@ jobs:
           name: execute_script
           command: |
             set -x
+            pwd
+            ls -l
             WORK_DIR="~/work"
             pip3 list
             # check target 
             BASE_REPO=main
             git diff --name-only ${BASE_REPO} > target.list
+            cat target.list
             SUBSIDIARY_COUNT=$(awk -F/ '{print $1}' target.list | uniq | wc -l)
             ENV_COUNT=$(awk -F/ '{print $2}' target.list | uniq | wc -l)
             if [ ${SUBSIDIARY_COUNT} -ne 1 -a ${ENV_COUNT} -ne 1 ]; then
