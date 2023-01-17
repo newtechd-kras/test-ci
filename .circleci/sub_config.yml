@@ -101,7 +101,7 @@ workflows:
           rel: "jp"
           file: "./rel/jp/rel.txt"
       - execute_update_script:
-           
+
   no_job_execution:
       when:
         and:
