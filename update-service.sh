@@ -45,11 +45,11 @@ git add .
 git commit -m "add release ${SERVICE} ${date}"
 git push origin ${BRANCH_NAME}
 
-pulls=$(curl \
+curl \
   -H "Accept: application/vnd.github.v3+json" \
   -H "Authorization: token ${GIT_TOKEN}" \
-  "https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/pulls?state=open&sort=updated&direction=desc")
-pulls_count=$(echo ${pulls} | jq .[].head.ref | grep ${BRANCH_NAME} | wc -l)
+  "https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/pulls?state=open&sort=updated&direction=desc" > pulls.json
+pulls_count=$(cat pulls.json | jq .[].head.ref | grep ${BRANCH_NAME} | wc -l)
 if [ ${pulls_count} -eq 0 ]; then
     curl -X POST -u "$GIT_USER:$GIT_TOKEN" \
         "https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/pulls" \
@@ -58,7 +58,7 @@ if [ ${pulls_count} -eq 0 ]; then
     cat response.json
     URL=$(jq -r .url response.json)
 else
-    URL=$(echo ${pulls} | jq .[0].url)
+    URL=$(cat pulls.json | jq .[0].url)
 fi
 echo ${URL}
 #curl -u "$GIT_USER:$GIT_TOKEN" -X PUT -H "Accept: application/vnd.github.v3+json" $URL/merge
