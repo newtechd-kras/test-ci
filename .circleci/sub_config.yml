@@ -93,13 +93,7 @@ jobs:
             while read service
             do 
               echo "service=${service}"
-              # lxxx1
-              while read target
-              do 
-                # python3 
-                echo "target"
-                lxxx2
-              done < <(cat target.list)
+              bash ${WORK_DIR}/update-service.sh ${service} ${WORK_DIR}/target.list
             done < <(cat ${TARGET_SERVICE_LIST})
             # PR
             # date=$(date '+%Y%m%d%H%M%S')
