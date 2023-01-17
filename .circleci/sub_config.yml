@@ -42,9 +42,10 @@ jobs:
           command: |
             set -x
             WORK_DIR="~/work"
+            pip3 list
             # check target 
             BASE_REPO=main
-            git diff --names-only ${BASE_REPO} > target.list
+            git diff --name-only ${BASE_REPO} > target.list
             SUBSIDIARY_COUNT=$(awk -F/ '{print $1}' target.list | uniq | wc -l)
             ENV_COUNT=$(awk -F/ '{print $2}' target.list | uniq | wc -l)
             if [ ${SUBSIDIARY_COUNT} -ne 1 -a ${ENV_COUNT} -ne 1 ]; then
@@ -70,9 +71,10 @@ jobs:
           name: execute_update_script
           command: |
             set -x
+            pip3 list
             WORK_DIR="~/work"
             BASE_REPO=main
-            git diff --names-only ${BASE_REPO} > target.list
+            git diff --name-only ${BASE_REPO} > target.list
             SUBSIDIARY=$(awk -F/ '{print $1}' target.list | uniq)
             ENV=$(awk -F/ '{print $2}' target.list | uniq)
             TARGET_REPO_LIST="~/work/"
