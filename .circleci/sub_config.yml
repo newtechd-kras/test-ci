@@ -59,6 +59,7 @@ jobs:
             while read line
             do 
               # python3 
+              echo "line=${line}"
             done < <(cat target.list)
   execute_pr:
     executor:
