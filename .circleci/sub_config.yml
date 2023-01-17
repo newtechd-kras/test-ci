@@ -93,14 +93,14 @@ workflows:
       - execute_shell_script:
           rel: "us"
           file: "./rel/us/rel.txt"
-      - execute_update_script:
+      - execute_update_script
   test-ci-release_jp:
     when: << pipeline.parameters.test-ci-release_jp >>
     jobs:
       - execute_shell_script:
           rel: "jp"
           file: "./rel/jp/rel.txt"
-      - execute_update_script:
+      - execute_update_script
 
   no_job_execution:
       when:
