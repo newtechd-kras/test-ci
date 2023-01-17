@@ -30,7 +30,8 @@ git clone https://$GIT_USER:$GIT_TOKEN@github.com/$REPO_BASE/$REPO_NAME.git
 
 # create branch
 cd ${REPO_NAME}
-git checkout -b $BRANCH_NAME
+git checkout -b ${BRANCH_NAME}
+git pull origin ${BRANCH_NAME} || true
 
 # target loop
 while read target 
