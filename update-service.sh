@@ -2,10 +2,12 @@
 
 set -euxo pipefail
 
+date=$(date '+%Y%m%d%H%M%S')
+
 # args
 SERVICE=$1
-TARGET_LIST=$2
-date=$(date '+%Y%m%d%H%M%S')
+BRANCH_NAME=$2
+TARGET_LIST=$3
 GIT_USER="newtechd-kras"
 # GIT_TOKEN
 
@@ -13,7 +15,9 @@ echo "---- update-service.sh TARGET_LIST=${TARGET_LIST}"
 
 REPO_BASE="newtechd-kras"
 REPO_NAME=${SERVICE}
-BRANCH_NAME="feature/update-yaml-${date}"
+PR_TITLE="add-release-${SERVICE}"
+PR_BASE="main"
+
 echo $GIT_TOKEN
 WORK_DIR=$(pwd)
 
@@ -37,14 +41,25 @@ do
   cp ${WORK_DIR}/${target} ${TARGET_DIR}
 done < <(cat ${TARGET_LIST})
 
-PR_TITLE="add release ${SERVICE} ${date}"
-PR_BASE="main"
 git add .
 git commit -m "add release ${SERVICE} ${date}"
 git push origin ${BRANCH_NAME}
-curl -X POST -u "$GIT_USER:$GIT_TOKEN" "https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/pulls" -H "Accept: application/vnd.github.v3+json" -d "{\"title\":\"${PR_TITLE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"${PR_BASE}\"}" > response.json
-cat response.json
-URL=$(jq -r .url response.json)
+
+pulls=$(curl \
+  -H "Accept: application/vnd.github.v3+json" \
+  -H "Authorization: token ${GIT_TOKEN}" \
+  "https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/pulls?state=open&sort=updated&direction=desc")
+pulls_count=$(echo ${pulls} | jq .[].head.ref | grep ${BRANCH_NAME} | wc -l)
+if [ ${pulls_count} -eq 0 ]; then
+    curl -X POST -u "$GIT_USER:$GIT_TOKEN" \
+        "https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/pulls" \
+        -H "Accept: application/vnd.github.v3+json" \
+        -d "{\"title\": \"${PR_TITLE}\", \"head\": \"${BRANCH_NAME}\", \"base\": \"${PR_BASE}\"}" > response.json
+    cat response.json
+    URL=$(jq -r .url response.json)
+else
+    URL=$(echo ${pulls} | jq .[0].url)
+fi
 echo ${URL}
 #curl -u "$GIT_USER:$GIT_TOKEN" -X PUT -H "Accept: application/vnd.github.v3+json" $URL/merge
 #curl -s -X DELETE -u "$GIT_USER:$GIT_TOKEN" https://api.github.com/repos/${REPO_BASE}/${REPO_NAME}/git/refs/heads/${BRANCH_NAME}

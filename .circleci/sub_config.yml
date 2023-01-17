@@ -91,7 +91,7 @@ jobs:
             while read service
             do 
               echo "service=${service}"
-              bash ${WORK_DIR}/update-service.sh ${service} ${WORK_DIR}/target.list
+              bash ${WORK_DIR}/update-service.sh ${service} ${CIRCLE_BRANCH} ${WORK_DIR}/target.list
             done < <(cat ${TARGET_SERVICE_LIST})
             # PR
             # date=$(date '+%Y%m%d%H%M%S')
