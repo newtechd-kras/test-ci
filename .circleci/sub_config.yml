@@ -76,7 +76,7 @@ jobs:
           command: |
             set -x
             pwd
-            ls -l
+            ls -lR
             pip3 list
             WORK_DIR="~/work"
             BASE_REPO=main
