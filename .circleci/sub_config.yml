@@ -47,7 +47,7 @@ jobs:
             pip3 list
             # check target 
             BASE_REPO=main
-            git diff --name-only ${BASE_REPO} > target.list
+            git diff --name-only ${BASE_REPO} | greo -v .circleci > target.list
             cat target.list
             SUBSIDIARY_COUNT=$(awk -F/ '{print $1}' target.list | uniq | wc -l)
             ENV_COUNT=$(awk -F/ '{print $2}' target.list | uniq | wc -l)
@@ -77,7 +77,7 @@ jobs:
             pip3 list
             WORK_DIR="~/work"
             BASE_REPO=main
-            git diff --name-only ${BASE_REPO} > target.list
+            git diff --name-only ${BASE_REPO} | greo -v .circleci > target.list
             SUBSIDIARY=$(awk -F/ '{print $1}' target.list | uniq)
             ENV=$(awk -F/ '{print $2}' target.list | uniq)
             TARGET_REPO_LIST="~/work/"
