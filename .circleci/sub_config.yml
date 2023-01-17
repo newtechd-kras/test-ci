@@ -93,7 +93,7 @@ jobs:
             while read service
             do 
               echo "service=${service}"
-              lxxx1
+              # lxxx1
               while read target
               do 
                 # python3 
