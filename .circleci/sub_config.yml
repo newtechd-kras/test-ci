@@ -75,6 +75,8 @@ jobs:
           name: execute_update_script
           command: |
             set -x
+            pwd
+            ls -l
             pip3 list
             WORK_DIR="~/work"
             BASE_REPO=main
@@ -84,6 +86,7 @@ jobs:
             TARGET_REPO_LIST="~/work/"
             # execute yaml update
             TARGET_SERVICE_LIST="${WORK_DIR}/${SUBSIDIARY}/${ENV}/service.list"
+            ls -l ${TARGET_SERVICE_LIST}
             while read service
             do 
               echo "service=${service}"
