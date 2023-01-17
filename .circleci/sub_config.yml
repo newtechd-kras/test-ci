@@ -20,7 +20,7 @@ executors:
       TZ: "JST-9"
 
 jobs:
-  execute_shell_script:
+  execute_check:
     parameters:
       rel:
         type: string
@@ -47,31 +47,37 @@ jobs:
             id
             git branch
             git status
-            which pip 
-            which pip3
-            # sudo apt-get update -y
-            # sudo apt-get install python3 python3-pip python3-setuptools
-            # sudo apt-get install python3 python3-pip
-            # sudo apt-get install -y python3-setuptools python3-pip
+            git diff --name-only origin/main
             pip3 install ruamel.yaml
             python3 --version
-            # sudo apt-get install python3-pip
             pip3 list
+            which jq
 
-  execute_update_script:
+  execute_pr:
     executor:
       name: default
     steps:
+      - checkout
       - run:
           name: execute_update_script
           command: |
             set -x
             echo update script
-            pwd
-            env
-            uname -a
-            lsb_release -a
-            pip3 list
+            pip3 install ruamel.yaml
+            GIT_USER="newtechd-kras"
+            echo $GIT_TOKEN
+            BRANCH_NAME="release-test"
+            REPO_NAME="test-ci-release"
+            git config --global user.email "kras@newtechd.com"
+            git config --global user.name "Yasunari Inoue"
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/newtechd-kras/$REPO_NAME.git
+            cd $REPO_NAME
+            git checkout -b $BRANCH_NAME
+            # git checkout -b $BRANCH_NAME origin/new_branch
+            cp ../test-ci/rel/jp/rel.txt .
+            git add .
+            git commit -m "add"
+            git push origin $BRANCH_NAME
 
   #
   no_job_execution:
@@ -90,17 +96,35 @@ workflows:
   test-ci-release_us:
     when: << pipeline.parameters.test-ci-release_us >>
     jobs:
-      - execute_shell_script:
+      - execute_check:
           rel: "us"
           file: "./rel/us/rel.txt"
-      - execute_update_script
+      - execute_pr:
+          # filters:
+          #   branches:
+          #     ignore: /.*/
+          #   tags:
+          #     only: /.*/
+          # branches:
+          #   only: main
+          requires:
+            - execute_check
   test-ci-release_jp:
     when: << pipeline.parameters.test-ci-release_jp >>
     jobs:
-      - execute_shell_script:
+      - execute_check:
           rel: "jp"
           file: "./rel/jp/rel.txt"
-      - execute_update_script
+      - execute_pr:
+          # filters:
+          #   branches:
+          #     ignore: /.*/
+          #   tags:
+          #     only: /.*/
+          # branches:
+          #   only: main
+          requires:
+            - execute_check
 
   no_job_execution:
       when:
