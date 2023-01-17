@@ -20,34 +20,6 @@ executors:
       TZ: "JST-9"
 
 jobs:
-  pipeline_start:
-    executor:
-      name: default
-    steps:
-      - run:
-          name: pipeline_start
-          command: |
-            set -x
-            echo "Execution date=`date`"
-            echo "Processing branch=${CIRCLE_PROJECT_REPONAME}"
-            echo "Processing branch=${CIRCLE_BRANCH}"
-            echo "Execution user=${CIRCLE_USERNAME}"
-            echo "----- circleci run -----"
-
-  clone_latest_script:
-    executor:
-      name: default
-    steps:
-      - run:
-          name: clone_repo
-          command: |
-            set -x
-            echo "----- clone steps -----"
-            git_exe_user=${USERNAME}
-            git_exe_user_token=${TOKEN}
-            echo "----- clone steps -----"
-            git clone https://${git_exe_user}:${git_exe_user_token}@github.com/newtechd-kras/test-ci.git
-
   execute_shell_script:
     parameters:
       rel:
@@ -86,6 +58,21 @@ jobs:
             # sudo apt-get install python3-pip
             pip3 list
 
+  execute_update_script:
+    executor:
+      name: default
+    steps:
+      - run:
+          name: execute_update_script
+          command: |
+            set -x
+            echo update script
+            pwd
+            env
+            uname -a
+            lsb_release -a
+            pip3 list
+
   #
   no_job_execution:
     docker:
@@ -106,12 +93,14 @@ workflows:
       - execute_shell_script:
           rel: "us"
           file: "./rel/us/rel.txt"
+      - execute_update_script:
   test-ci-release_jp:
     when: << pipeline.parameters.test-ci-release_jp >>
     jobs:
       - execute_shell_script:
           rel: "jp"
           file: "./rel/jp/rel.txt"
+      - execute_update_script:
            
   no_job_execution:
       when:
