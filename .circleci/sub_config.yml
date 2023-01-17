@@ -76,9 +76,7 @@ jobs:
           command: |
             set -x
             pwd
-            ls -lR
-            echo ~
-            pip3 list
+            # ls -lR
             WORK_DIR=$(pwd)
             BASE_REPO=main
             git diff --name-only ${BASE_REPO} | grep -v .circleci | grep -v .sh | grep -v .list > target.list
