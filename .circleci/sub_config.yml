@@ -43,7 +43,7 @@ jobs:
             set -x
             pwd
             ls -l
-            WORK_DIR="~/work"
+            WORK_DIR=$(pwd)
             pip3 list
             # check target 
             BASE_REPO=main
@@ -79,7 +79,7 @@ jobs:
             ls -lR
             echo ~
             pip3 list
-            WORK_DIR="~/work"
+            WORK_DIR=$(pwd)
             BASE_REPO=main
             git diff --name-only ${BASE_REPO} | grep -v .circleci | grep -v service.list > target.list
             SUBSIDIARY=$(awk -F/ '{print $1}' target.list | uniq)
