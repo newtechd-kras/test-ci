@@ -1,0 +1,169 @@
+version: 2.1
+orbs:
+  python: circleci/python@2.1.1
+  path-filtering: circleci/path-filtering@0.0.2
+
+## define 
+parameters:
+  test-ci-release_us:
+    type: boolean
+    default: false
+  test-ci-release_jp:
+    type: boolean
+    default: false
+
+executors:
+  default:
+    docker:
+      - image: cimg/python:3.11
+    environment:
+      TZ: "JST-9"
+
+jobs:
+  execute_check:
+    parameters:
+      rel:
+        type: string
+        default: ""
+      file:
+        type: string
+        default: ""
+    executor:
+      name: default
+    working_directory: ~/work
+    steps:
+      - checkout
+      - run:
+          name: setup 
+          command: |
+            pip3 install ruamel.yaml
+      - run:
+          name: execute_script
+          command: |
+            set -x
+            WORK_DIR="~/work"
+            pip3 list
+            # check target 
+            BASE_REPO=main
+            git diff --name-only ${BASE_REPO} > target.list
+            SUBSIDIARY_COUNT=$(awk -F/ '{print $1}' target.list | uniq | wc -l)
+            ENV_COUNT=$(awk -F/ '{print $2}' target.list | uniq | wc -l)
+            if [ ${SUBSIDIARY_COUNT} -ne 1 -a ${ENV_COUNT} -ne 1 ]; then
+              echo "multi target error"
+              exit 1
+            fi
+            # check yaml update
+            while read line
+            do 
+              # python3 
+            done < <(cat target.list)
+  execute_pr:
+    executor:
+      name: default
+    working_directory: ~/work
+    steps:
+      - checkout
+      - run:
+          name: setup 
+          command: |
+            pip3 install ruamel.yaml
+      - run:
+          name: execute_update_script
+          command: |
+            set -x
+            pip3 list
+            WORK_DIR="~/work"
+            BASE_REPO=main
+            git diff --name-only ${BASE_REPO} > target.list
+            SUBSIDIARY=$(awk -F/ '{print $1}' target.list | uniq)
+            ENV=$(awk -F/ '{print $2}' target.list | uniq)
+            TARGET_REPO_LIST="~/work/"
+            # execute yaml update
+            TARGET_SERVICE_LIST="${WORK_DIR}/${SUBSIDIARY}/${ENV}/service.list"
+            while read service
+            do 
+              echo "service=${service}"
+              while read target
+              do 
+                # python3 
+                echo "target"
+              done < <(cat target.list)
+            done < <(cat ${TARGET_SERVICE_LIST})
+            # PR
+            # date=$(date '+%Y%m%d%H%M%S')
+            # GIT_USER="newtechd-kras"
+            # echo $GIT_TOKEN
+            # BASE_NAME="newtechd-kras"
+            # BRANCH_NAME="release-test"
+            # REPO_NAME="test-ci-release"
+            # git config --global user.email "kras@newtechd.com"
+            # git config --global user.name "Yasunari Inoue"
+            # git clone https://$GIT_USER:$GIT_TOKEN@github.com/$BASE_NAME/$REPO_NAME.git
+            # cd $REPO_NAME
+            # git checkout -b $BRANCH_NAME
+            # # git checkout -b $BRANCH_NAME origin/new_branch
+            # cp ../test-ci/rel/jp/rel.txt .
+            # git add .
+            # git commit -m "add"
+            # git push origin $BRANCH_NAME
+            # PR_TITLE="add release PR"
+            # PR_BASE="main"
+            # curl -X POST -u "$GIT_USER:$GIT_TOKEN" "https://api.github.com/repos/$BASE_NAME/$REPO_NAME/pulls" -H "Accept: application/vnd.github.v3+json" -d "{\"title\":\"$PR_TITLE\",\"head\":\"$BRANCH_NAME\",\"base\":\"PR_BASE\"}" > response.json
+            # URL=$(jq -r .url response.json)
+            # curl -u "$GIT_USER:$GIT_TOKEN" -X PUT -H "Accept: application/vnd.github.v3+json" $URL/merge
+            # curl -s -X DELETE -u "$GIT_USER:$GIT_TOKEN" https://api.github.com/repos/$BASE_NMAE/$REPO_NAME/git/refs/heads/$BRANCH_NAME
+
+  #
+  no_job_execution:
+    docker:
+      - image: cimg/base:2021.01
+    environment:
+      TZ: "JST-9"
+    steps:
+      - run:
+          name: no_job_execution
+          command: |
+            echo "------------ Job execution is skipped"
+
+workflows:
+  version: 2.1
+  test-ci-release_us:
+    when: << pipeline.parameters.test-ci-release_us >>
+    jobs:
+      - execute_check:
+          rel: "us"
+          file: "./rel/us/rel.txt"
+      - execute_pr:
+          # filters:
+          #   branches:
+          #     ignore: /.*/
+          #   tags:
+          #     only: /.*/
+          # branches:
+          #   only: main
+          requires:
+            - execute_check
+  test-ci-release_jp:
+    when: << pipeline.parameters.test-ci-release_jp >>
+    jobs:
+      - execute_check:
+          rel: "jp"
+          file: "./rel/jp/rel.txt"
+      - execute_pr:
+          # filters:
+          #   branches:
+          #     ignore: /.*/
+          #   tags:
+          #     only: /.*/
+          # branches:
+          #   only: main
+          requires:
+            - execute_check
+
+  no_job_execution:
+      when:
+        and:
+          - not: << pipeline.parameters.test-ci-release_us >>
+          - not: << pipeline.parameters.test-ci-release_jp >>
+      jobs:
+        - no_job_execution
