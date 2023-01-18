@@ -16,5 +16,5 @@ workflows:
           base-revision: << pipeline.git.branch >>
           config-path: .circleci/sub_config.yml
           mapping: |
-            rel/jp/.*      test-ci-release_jp         true
-            rel/us/.*      test-ci-release_us         true
+            jp/.*      test-ci-release_jp         true
+            us/.*      test-ci-release_us         true

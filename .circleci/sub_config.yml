@@ -41,11 +41,14 @@ jobs:
           name: execute_script
           command: |
             set -x
-            WORK_DIR="~/work"
+            pwd
+            ls -l
+            WORK_DIR=$(pwd)
             pip3 list
             # check target 
             BASE_REPO=main
-            git diff --name-only ${BASE_REPO} > target.list
+            git diff --name-only ${BASE_REPO} | grep -v .circleci | grep -v .sh | grep -v .list > target.list
+            cat target.list
             SUBSIDIARY_COUNT=$(awk -F/ '{print $1}' target.list | uniq | wc -l)
             ENV_COUNT=$(awk -F/ '{print $2}' target.list | uniq | wc -l)
             if [ ${SUBSIDIARY_COUNT} -ne 1 -a ${ENV_COUNT} -ne 1 ]; then
@@ -56,6 +59,7 @@ jobs:
             while read line
             do 
               # python3 
+              echo "line=${line}"
             done < <(cat target.list)
   execute_pr:
     executor:
@@ -71,23 +75,23 @@ jobs:
           name: execute_update_script
           command: |
             set -x
-            pip3 list
-            WORK_DIR="~/work"
+            pwd
+            # ls -lR
+            WORK_DIR=$(pwd)
             BASE_REPO=main
-            git diff --name-only ${BASE_REPO} > target.list
+            git diff --name-only ${BASE_REPO} | grep -v .circleci | grep -v .sh | grep -v .list > target.list
             SUBSIDIARY=$(awk -F/ '{print $1}' target.list | uniq)
             ENV=$(awk -F/ '{print $2}' target.list | uniq)
             TARGET_REPO_LIST="~/work/"
             # execute yaml update
             TARGET_SERVICE_LIST="${WORK_DIR}/${SUBSIDIARY}/${ENV}/service.list"
+            ls -l ${TARGET_SERVICE_LIST}
+            cat ${TARGET_SERVICE_LIST}
+            echo "---------------"
             while read service
             do 
               echo "service=${service}"
-              while read target
-              do 
-                # python3 
-                echo "target"
-              done < <(cat target.list)
+              bash ${WORK_DIR}/update-service.sh ${service} ${CIRCLE_BRANCH} ${WORK_DIR}/target.list
             done < <(cat ${TARGET_SERVICE_LIST})
             # PR
             # date=$(date '+%Y%m%d%H%M%S')
